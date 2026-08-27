@@ -6,7 +6,7 @@ test("plugin manifest and entry implement Workbench Plugin API v1", async () => 
   const manifest = JSON.parse(await readFile("plugin.json", "utf8"));
   assert.equal(manifest.schemaVersion, 1);
   assert.equal(manifest.id, "worktable");
-  assert.equal(manifest.version, "0.6.0");
+  assert.equal(manifest.version, "0.6.1");
   assert.equal(manifest.apiVersion, "1");
   assert.equal(manifest.publisher, "LYWork");
   assert.equal(manifest.entry, "dist/index.js");

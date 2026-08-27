@@ -2,7 +2,7 @@
 
 LYWork 的官方 Worktable 插件。该仓库独立维护插件源码、版本和 Release；LYWork 主仓库负责 Plugin Host、安装回滚、安全协议，以及经过验证的随包兜底副本。
 
-当前 `0.6.0` 实现对应 LYWork Worktable 插件化开发计划的 Phase 0–6：
+当前 `0.6.1` 实现对应 LYWork Worktable 插件化开发计划的 Phase 0–6，并建立无需签名密钥的独立 SHA-256 更新通道：
 
 - Worktable 控制室和多项目状态聚合；
 - 与 LYWork 原生 Agent Session 共用的工作台布局；
