@@ -29,14 +29,9 @@ npm run package
 
 ## 正式发布
 
-正式 Tag Workflow 使用仓库 Secret `WORKTABLE_SIGNING_PRIVATE_KEY_PEM`：
+正式 Tag Workflow 不依赖签名密钥。Tag 必须与 `plugin.json` 和 `package.json` 版本一致；Workflow 会生成固定名称的插件包、SHA-256 和 Release 元数据。
 
-1. 私钥必须为与 `update.json` 公钥匹配的 Ed25519 私钥；
-2. 私钥只保存在 GitHub Actions Secret，不写入源码或日志；
-3. Tag 必须与 `plugin.json` 和 `package.json` 版本一致；
-4. Workflow 生成固定名称的插件包、SHA-256、分离签名和 Release 元数据。
-
-LYWork 只会从 `update.json` 指定的官方 GitHub 仓库检查更新，并在用户确认后校验哈希、签名和插件身份。
+LYWork 只会从 `update.json` 指定的官方 GitHub 仓库检查更新，并在用户确认后校验 HTTPS 来源、SHA-256 和插件身份。
 
 ## 与 LYWork 同步
 

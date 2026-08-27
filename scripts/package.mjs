@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { createHash, createPrivateKey, createPublicKey, sign } from "node:crypto";
+import { createHash } from "node:crypto";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -59,7 +59,6 @@ function createStoredZip(entries) {
 }
 
 await import(`file://${join(root, "scripts", "verify.mjs").replaceAll("\\", "/")}`);
-const update = JSON.parse(await readFile(join(root, "update.json"), "utf8"));
 const included = ["plugin.json", "dist/core.js", "dist/index.js", "dist/styles.css", "LICENSE"];
 const entries = await Promise.all(included.map(async (name) => [name, await readFile(join(root, ...name.split("/")))]));
 const manifest = JSON.parse(entries[0][1].toString("utf8"));
@@ -75,22 +74,12 @@ await mkdir(outputRoot, { recursive: true });
 await writeFile(join(outputRoot, assetName), archive);
 await writeFile(join(outputRoot, `${assetName}.sha256`), `${digest}  ${assetName}\n`, "utf8");
 
-if (process.argv.includes("--sign")) {
-	const encodedKey = process.env.WORKTABLE_SIGNING_PRIVATE_KEY_PEM;
-	assert.ok(encodedKey, "WORKTABLE_SIGNING_PRIVATE_KEY_PEM is required for a signed release");
-	const privateKey = createPrivateKey(encodedKey.replaceAll("\\n", "\n"));
-	const actualPublicKey = createPublicKey(privateKey).export({ type: "spki", format: "pem" }).trim();
-	assert.equal(actualPublicKey, update.publicKeyPem.trim(), "release signing key does not match update.json");
-	const signature = sign(null, Buffer.from(digest, "utf8"), privateKey).toString("base64");
-	await writeFile(join(outputRoot, `${assetName}.sig`), `${signature}\n`, "utf8");
-}
-
 await writeFile(join(outputRoot, "release.json"), `${JSON.stringify({
 	pluginId: "worktable",
 	version: manifest.version,
 	asset: assetName,
 	sha256: digest,
 	manifestSha256: manifestDigest,
-	signed: process.argv.includes("--sign"),
+	signed: false,
 }, null, 2)}\n`, "utf8");
 console.log(`Created ${assetName} (${digest}).`);
