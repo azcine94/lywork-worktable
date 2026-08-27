@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LYWork Worktable 控制室预览</title>
+  <link rel="stylesheet" href="./dist/styles.css">
+  <style>
+    :root {
+      --font-family-base: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+      --font-family-mono: "Cascadia Code", Consolas, monospace;
+      --font-size-body: 13px;
+      --font-size-caption: 11px;
+      --radius-sm: 5px;
+      --radius-md: 8px;
+      --color-bg-app: #f4f6f9;
+      --color-bg-panel: #fff;
+      --color-bg-muted: #f7f8fa;
+      --color-bg-hover: #f1f3f6;
+      --color-bg-active: #eef1f5;
+      --color-border-subtle: #e2e6ed;
+      --color-border-default: #cfd5df;
+      --color-text-primary: #172033;
+      --color-text-secondary: #697386;
+      --color-text-tertiary: #8a93a2;
+      --focus-ring: 0 0 0 2px #365f91;
+    }
+    * { box-sizing: border-box; }
+    html, body, #preview { width: 100%; height: 100%; margin: 0; }
+    body { min-width: 720px; min-height: 560px; background: #f4f6f9; }
+  </style>
+</head>
+<body>
+  <div id="preview"></div>
+  <script type="module">
+    import { activate } from "./dist/index.js";
+    import { emptyWorktableState } from "./dist/core.js";
+
+    const now = Date.now();
+    const projects = [
+      { id: "atlas", name: "旅行 Atlas", kind: "worktable", path: "C:/Worktables/atlas", createdAt: now - 86400000 * 5, lastOpenedAt: now - 120000 },
+      { id: "map", name: "建筑草图", kind: "worktable", path: "C:/Worktables/map", createdAt: now - 86400000 * 4, lastOpenedAt: now - 660000 },
+      { id: "knowledge", name: "AI 知识地图", kind: "worktable", path: "C:/Worktables/knowledge", createdAt: now - 86400000 * 3, lastOpenedAt: now - 7200000 },
+      { id: "media", name: "自媒体工作台", kind: "worktable", path: "C:/Worktables/media", createdAt: now - 86400000 * 2, lastOpenedAt: now - 86400000 },
+      { id: "fitness", name: "健身记录", kind: "worktable", path: "C:/Worktables/fitness", createdAt: now - 86400000, lastOpenedAt: now - 420000 },
+    ];
+    const agentStates = [
+      { agentId: "a1", projectId: "atlas", sessionKey: "s1", status: "running", phase: "running", revision: 4, turn: 2, pendingApprovals: 0, pendingUiRequests: 0, subagents: { running: 1, blocked: 0, failed: 0 } },
+      { agentId: "a2", projectId: "map", sessionKey: "s2", status: "idle", phase: "idle", lastOutcome: "succeeded", revision: 3, turn: 1, pendingApprovals: 0, pendingUiRequests: 0, subagents: { running: 0, blocked: 0, failed: 0 } },
+      { agentId: "a3", projectId: "knowledge", sessionKey: "s3", status: "idle", phase: "idle", revision: 2, turn: 1, pendingApprovals: 0, pendingUiRequests: 0, subagents: { running: 0, blocked: 0, failed: 0 } },
+      { agentId: "a4", projectId: "fitness", sessionKey: "s4", status: "running", phase: "running", revision: 5, turn: 3, pendingApprovals: 1, pendingUiRequests: 0, subagents: { running: 0, blocked: 0, failed: 0 } },
+    ];
+    const storage = new Map([["state", emptyWorktableState()]]);
+    const subscriptions = () => () => {};
+    const artifactFor = (projectId) => ({
+      worktableId: `${projectId}-app`, appId: `${projectId}-app`, name: `${projects.find((item) => item.id === projectId)?.name} 应用`,
+      manifestPath: `C:/Worktables/${projectId}/worktables/main/lywork-worktable.json`, fingerprint: `${projectId}-v1`,
+    });
+    const context = {
+      plugin: { id: "worktable", version: "0.6.0" },
+      workspace: {
+        registerSurface(surface) {
+          void surface.mount(document.querySelector("#preview"), { theme: "light" });
+          return () => {};
+        },
+      },
+      projects: {
+        list: () => projects,
+        open: async (projectId) => console.info("open project", projectId),
+        requestCreate: () => console.info("create project"),
+        subscribe: subscriptions,
+      },
+      sessions: { list: () => [], getCurrent: () => undefined, create: async () => undefined, open: async () => {}, subscribe: subscriptions },
+      agents: { getStates: () => agentStates, prompt: async () => {}, abort: async () => {}, subscribeState: subscriptions },
+      artifacts: {
+        inspect: async (projectId) => ({ artifacts: [artifactFor(projectId)], errors: projectId === "media" ? [{ code: "MANIFEST_INVALID", message: "应用清单需要修复" }] : [] }),
+        discover: async () => [], mount: async () => ({}), subscribe: subscriptions,
+        storage: { get: async () => undefined, set: async () => {}, remove: async () => {} },
+      },
+      files: { list: async () => [] },
+      storage: { get: async (key) => storage.get(key), set: async (key, value) => storage.set(key, value), remove: async (key) => storage.delete(key) },
+      hostState: { get: async () => undefined, set: async () => {}, remove: async () => {} },
+      management: {
+        getDiagnostics: async () => ({ activeVersion: "0.6.0", activeSource: "bundled", storagePath: "preview" }),
+        checkForUpdates: async () => ({ available: false, latestVersion: "0.6.0" }),
+        installUpdate: async () => {}, rollback: async () => {}, restoreBundled: async () => {}, setDisabled: async () => {},
+      },
+    };
+    activate(context);
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "lywork-worktable",
+  "version": "0.6.0",
+  "description": "Official Worktable plugin for LYWork.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "npm run build && node scripts/verify.mjs && node --test tests/plugin.test.mjs",
+    "verify": "npm test",
+    "package": "npm run verify && node scripts/package.mjs",
+    "release": "npm run verify && node scripts/package.mjs --sign"
+  }
+}

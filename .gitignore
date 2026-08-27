@@ -1,0 +1,4 @@
+node_modules/
+release/
+*.lywork-plugin
+.DS_Store

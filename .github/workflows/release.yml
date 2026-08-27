@@ -1,0 +1,46 @@
+name: Worktable Release
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-worktable-package
+          path: release/
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run release
+        env:
+          WORKTABLE_SIGNING_PRIVATE_KEY_PEM: ${{ secrets.WORKTABLE_SIGNING_PRIVATE_KEY_PEM }}
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/lywork-worktable.lywork-plugin
+            release/lywork-worktable.lywork-plugin.sha256
+            release/lywork-worktable.lywork-plugin.sig
+            release/release.json
