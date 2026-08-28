@@ -3,7 +3,5 @@
   "owner": "azcine94",
   "repository": "lywork-worktable",
   "packageAsset": "lywork-worktable.lywork-plugin",
-  "sha256Asset": "lywork-worktable.lywork-plugin.sha256",
-  "signatureAsset": "lywork-worktable.lywork-plugin.sig",
-  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAkfgd0OG6VESWqBoeAZUa0Cg6ry0UIGdtFZTUX3vd+wE=\n-----END PUBLIC KEY-----\n"
+  "sha256Asset": "lywork-worktable.lywork-plugin.sha256"
 }

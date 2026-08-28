@@ -35,12 +35,9 @@ jobs:
         with:
           node-version: 22
       - run: npm run release
-        env:
-          WORKTABLE_SIGNING_PRIVATE_KEY_PEM: ${{ secrets.WORKTABLE_SIGNING_PRIVATE_KEY_PEM }}
       - uses: softprops/action-gh-release@v2
         with:
           files: |
             release/lywork-worktable.lywork-plugin
             release/lywork-worktable.lywork-plugin.sha256
-            release/lywork-worktable.lywork-plugin.sig
             release/release.json

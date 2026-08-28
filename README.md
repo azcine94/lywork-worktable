@@ -2,7 +2,7 @@
 
 LYWork 的官方 Worktable 插件。该仓库独立维护插件源码、版本和 Release；LYWork 主仓库负责 Plugin Host、安装回滚、安全协议，以及经过验证的随包兜底副本。
 
-当前 `0.6.0` 实现对应 LYWork Worktable 插件化开发计划的 Phase 0–6：
+当前 `0.6.1` 实现对应 LYWork Worktable 插件化开发计划的 Phase 0–6，并建立无需签名密钥的独立 SHA-256 更新通道：
 
 - Worktable 控制室和多项目状态聚合；
 - 与 LYWork 原生 Agent Session 共用的工作台布局；
@@ -29,14 +29,9 @@ npm run package
 
 ## 正式发布
 
-正式 Tag Workflow 使用仓库 Secret `WORKTABLE_SIGNING_PRIVATE_KEY_PEM`：
+正式 Tag Workflow 不依赖签名密钥。Tag 必须与 `plugin.json` 和 `package.json` 版本一致；Workflow 会生成固定名称的插件包、SHA-256 和 Release 元数据。
 
-1. 私钥必须为与 `update.json` 公钥匹配的 Ed25519 私钥；
-2. 私钥只保存在 GitHub Actions Secret，不写入源码或日志；
-3. Tag 必须与 `plugin.json` 和 `package.json` 版本一致；
-4. Workflow 生成固定名称的插件包、SHA-256、分离签名和 Release 元数据。
-
-LYWork 只会从 `update.json` 指定的官方 GitHub 仓库检查更新，并在用户确认后校验哈希、签名和插件身份。
+LYWork 只会从 `update.json` 指定的官方 GitHub 仓库检查更新，并在用户确认后校验 HTTPS 来源、SHA-256 和插件身份。
 
 ## 与 LYWork 同步
 
